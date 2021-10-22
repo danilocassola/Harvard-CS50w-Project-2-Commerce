@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %} Auctions | Categories {% endblock %}
+
+{% block body %}
+    <div class="divform">
+        <h2>Categories</h2>
+        <div class="album py-3 bg-light">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    {% for category in categories %}
+                    <a href="{% url 'category_id' category.id %}">
+                        <div class="col">
+                            <div class="card text-center shadow-sm divcard">
+                                <div class="card-body">
+                                  <spam class="card-title"> {{ category }} </spam>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+     </div>
+
+{% endblock %}

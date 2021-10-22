@@ -1,0 +1,40 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Auctions | Create Listing{% endblock %}
+
+{% block body %}
+    <div class="divform">
+        <h2>Create Listing</h2>
+        {% if message %}
+            <div>{{ message }}</div>
+        {% endif %}
+        <form action="{% url 'create' %}" method="POST" autocomplete="off">
+            {% csrf_token %}
+            <div class="form-group">
+                <input class="form-control" autofocus type="text" name="title" placeholder="Title" required>
+            </div>
+            <div class="mb-3">
+                <textarea class="form-control" name="description" placeholder="Description" rows="6" required></textarea>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="url" name="imageUrl" placeholder="Image URL">
+            </div>
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="category">Category:</label>
+              <select class="form-control" name="category" id="category">
+                <option value="0" selected>-----</option>
+                {% for category in categories|dictsort:"category" %}
+                    <option value="{{ category.id }}">{{ category }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Starting bid:</span>
+              <input type="text" name="starting_bid" class="form-control" placeholder="$" required>
+            </div>
+
+            <input class="btn btn-primary" type="submit" value="Create">
+        </form>
+    </div>
+
+{% endblock %}

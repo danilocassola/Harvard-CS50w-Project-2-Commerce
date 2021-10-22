@@ -1,0 +1,42 @@
+.bmain {
+    padding: 10px 0 0 10px;
+}
+
+.divform {
+    width: 50%;
+    margin: auto;
+}
+
+.divcard {
+    margin-top: 15px;
+    max-width: 800px;
+}
+
+.divbody {
+    width: 80%;
+    margin: auto;
+}
+
+.h2 {
+    padding: 0 0 10px 10px;
+}
+
+.divdetails {
+    padding: 0px 0 0px 0;
+}
+
+.divright {
+    text-align: right;
+}
+
+#watchlist {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+}
+
+#close {
+    position: absolute;
+    top: 15px;
+    right: 120px;
+}

@@ -1,0 +1,168 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Auctions | Listing: {{ listing.title }}{% endblock %}
+
+{% block body %}
+    <div class="divbody">
+
+      {% if message %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endif %}
+
+      <h2>Listing: {{ listing.title }}</h2>
+      <div class="card mb-3 divcard">
+        <div class="row g-0">
+          <div class="col-md-5">
+
+            {% if listing.imageUrl == "" or listing.imageUrl == none %}
+              {% load static %} <img src="{% static "auctions/media/img.jpg" %}" class="img-fluid rounded-start" alt="Image: {{ listing.title }}" />
+            {% else %}
+              <img src="{{ listing.imageUrl }}" class="img-fluid rounded-start" alt="Image: {{ listing.title }}" />
+            {% endif %}
+
+          </div>
+          <div class="col-md-7">
+            <div class="card-body">
+
+              <!-- Watchlist -->
+              {% if user.is_authenticated %}
+                <form id="watchlist" action="{% url 'watchlist' %}" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                  {% if watchlist_status == False %}
+                    <button type="submit" class="btn btn-outline-info btn-sm" name="watchlist_value" value="add">Watchlist</button>
+                  {% else %}
+                    <button type="submit" class="btn btn-info btn-sm" name="watchlist_value" value="remove">Watchlist</button>
+                  {% endif %}
+                </form>
+              {% endif %}
+
+              <!-- Listing status -->
+              {% if listing.user == user %}
+                <form id="close" action="{% url 'active' %}" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                  <button type="submit" class="btn {{ status.btn_class }} btn-sm" name="active" value="{{ status.listing }}">{{ status.btn_text }}</button>
+                </form>
+              {% endif %}
+
+              <h5 class="card-title">{{ listing.title }}</h5>
+              <p class="card-text text-justify">{{ listing.description }}</p>
+              <p class="card-text"><small class="text-muted">Created: {{ listing.date_created }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who won the auction -->
+      {% if listing.active == False %}
+            {% if greater_bid.user == user %}
+              <div class="alert alert-success divcard" role="alert">
+                <h5>You won that auction!</h5>
+              </div>
+            {% elif listing.user == user and greater_bid.user != None %}
+              <div class="alert alert-success divcard" role="alert">
+                 <h5>{{ greater_bid.user }} won that auction</h5>
+              </div>
+            {% endif %}
+      {% endif %}
+
+      <div class="card divcard">
+        <div class="card-body">
+
+          {% if greater_bid != None %}
+            <p><h5>Current Price: <span class="badge bg-success text-white">${{ greater_bid.current_price }}</span></h5></p>
+          {% else %}
+            <p><h5>Current Price: <span class="badge bg-success text-white">${{ listing.starting_bid }}</span></h5></p>
+          {% endif %}
+            <small class="text-muted">
+              {{ count_bid }} bid(s) so far.
+              {% if greater_bid.user == user %}
+                Your bid is the current bid.
+              {% endif %}
+            </small>
+
+          {% if listing.active == True %}
+            {% if user.is_authenticated %}
+              <form action="{% url 'listing' listing.id %}" method="POST" autocomplete="off">
+                {% csrf_token %}
+                <div class="row g-2">
+                  <div class="col-auto">
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="text" name="bid_user" class="form-control" placeholder="$" required>
+                  </div>
+                  <div class="col-auto" style="padding-left:0px">
+                    <input class="btn btn-primary" type="submit" value="Place Bid">
+                  </div>
+                </div>
+              </form>
+            {% else %}
+              </br>
+              <a href="{% url 'login' %}">Log In</a> to place a bid.
+            {% endif %}
+          {% else %}
+            <h5><span class="badge bg-danger text-white">This listing is closed</span></h5>
+          {% endif %}
+          </br>
+          <hr>
+
+          <!--------------- Details --------------->
+          <div class="divdetails">
+            <h5>Details</h5>
+            <small>
+              - Listed by: {{ listing.user }}<br>
+              - Category:
+              {% if listing.category == None %}
+              No Category Listed <br>
+              {% else %}
+              {{ listing.category }}<br>
+              {% endif %}
+
+              - Starting Bid: ${{ listing.starting_bid }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!------------- Comments -------------->
+      <div class="divcard">
+        <div class="my-3 p-3 bg-body rounded shadow-sm">
+          <h6 class="pb-0 mb-0">Comments</h6>
+          <hr/>
+          {% for comment in comments %}
+            <div class="d-flex text-muted pt-2">
+              <spam class="pb-0 mb-0 small lh-sm">
+                <strong class="d-block text-gray-dark">{{ comment.user}}</strong>
+                {{ comment.comment }}
+              </spam>
+            </div>
+            <hr/>
+          {% endfor %}
+
+          {% if listing.active == True %}
+            {% if user.is_authenticated %}
+              <small class="d-block text-end mt-3">
+                <form action="{% url 'comments' %}" method="POST" autocomplete="off">
+                  {% csrf_token %}
+                    <div class="form">
+                      <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                      <textarea class="form-control" placeholder="Leave a comment here" name="comment" style="height: 100px" required></textarea>
+                    </div>
+                    </br>
+                    <input class="btn btn-sm btn-outline-secondary" type="submit" value="Comment">
+                </form>
+              </small>
+            {% else %}
+              <spam class="small text-muted">
+                <a href="{% url 'login' %}">Log In</a> to leave a comment.
+              </spam>
+            {% endif %}
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
